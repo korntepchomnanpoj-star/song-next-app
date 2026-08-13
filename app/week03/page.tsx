@@ -18,7 +18,7 @@ export default function ToDoList(){
 
     const tmpTdl = toDoList.map(item =>
         <ul>
-        <div className="px-3 py-2 bg-white-600 text-black text-sm font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
+        <div className="max w-md mx-auto my-1 p-1 px-3 py-2 bg-white-600 text-black text-sm font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
       <h3 className="text-xl font-medium text-black">{item.title}</h3>
       <p className="text-slate-500 text-sm">{item.desc}</p>
       <p className="text-slate-500 text-sm">{item.author}</p>
@@ -36,7 +36,7 @@ export default function ToDoList(){
         <Header/>
         <div className= "flex justify-center gap-3">
             
-    <a className="px-3 py-2 bg-yellow-300 text-black text-sm font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
+    <a className="max w-md mx-auto my-12 p-12 px-3 py-2 bg-yellow-300 text-black text-sm font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
       <p className="font-bold text-xl mb-2">To Do Lists:</p>
       <p>
         ชื่อ-สกุล: {name} <br></br> 
