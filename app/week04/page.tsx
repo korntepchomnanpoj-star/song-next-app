@@ -3,7 +3,9 @@
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { dataItem, appendItem } from "../data/dataitem";
-import { useState } from "react";
+import { Children, useState } from "react";
+import ToDoForm from "./components/ToDoForm";
+import Modal from "./components/Modal";
 
 export default function ToDoList(){
     
@@ -11,6 +13,7 @@ export default function ToDoList(){
     const [tasks, setTasks] = useState(toDolist);
     const [numOfTasks, setNoft] = useState(tasks.length);
     const [status, setStatus] = useState(null);
+    const [openId, setOpenId] = useState(null);
 
     const filteredTasks = 
           status == null ? tasks 
@@ -36,6 +39,15 @@ export default function ToDoList(){
        return <span style={{color: "green"}}>Completed</span>;
        return <span style={{color: "red"}}>Pending</span>;
     }
+
+    const onEdit = (t) => {
+      alert(`งานที่คุณต้องการแก้ไข ${t}`);
+    }
+
+    const onDelete = (id) => {
+      alert(`คุณต้องการลบข้อมูล รหัสงาน ${id}`);
+    }
+
     const tmpTdl = filteredTasks.map((item,index) => { 
         const {id, title, desc, author, date_added, status } = item;
         return <ul key={id}>
@@ -44,18 +56,39 @@ export default function ToDoList(){
       <p className="text-slate-500 text-sm">{desc}</p>
       <p className="text-slate-500 text-sm">{author}</p>
       <p className="text-slate-500 text-sm">{Status(status)}</p>
+
+      <Modal open={openId === id} onClose={()=>setOpenId(null)}>
+      <div className="p-4">
+      <h2 className="text-2xl font-bold mb-2">{title}</h2>
+      <p className="text-gray-700 mb-2">รายละเอียด: {desc}</p>
+      <p className="text-sm text-gray-500">ผู้เพิ่ม: {author}</p>
+      <p className="text-sm text-gray-500">วันที่: {date_added}</p>
+      <p className="text-sm text-gray-500">สถานะ: {Status(status)}</p>
+      </div>
+      </Modal>
+
+      <div className="flex gap-2 mt-2">
+    {/* View */}
+    <button onClick={(e)=>setOpenId(id)} className="bg-green-500 text-white px-3 py-1 rounded">View</button>
+
+    {/* Edit */}
+    <button onClick={(e)=>onEdit(item)} className="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+
+    {/* Delete */}
+    <button onClick={(e)=>onDelete(id)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+     </div>
     </div>
         </ul>;
 });
 
-    const addTask = () => {
+    const addTask = (title, status) => {
         const newTask = {
         id: tasks.length+1,
-        title: "่ทดสอบเพิ่มงาน",
+        title: title,
         desc: "รายละเอียดของงานที่เพิ่ม",
-        date_added: "13/08/2569",
+        date_added: "17/08/2569",
         author: "Korntep C.",
-        status: true
+        status: status
         };
 
         setTasks([...tasks, newTask]);
@@ -82,13 +115,14 @@ export default function ToDoList(){
       </a>
       </div>
 
-
+       
       <div className="bg-slate-200/60 p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 my-4">
 
         <div className="flex items-center gap-3"></div>
         <div>งานที่ต้องทำ {numOfTasks} รายการ</div>
         <div className="flex flex-wrap items-center justify-between gap-4 my-4">
-          <button className="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg transition font-medium" onClick={addTask}>เพิ่มงาน </button>
+          <ToDoForm addTask={addTask} />
+          {/* <button className="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg transition font-medium" onClick={addTask}>เพิ่มงาน </button> */}
         <div className="flex items-center gap-2">
             <button className="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(null)}>[A] All</button>
             <button className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(true)}>[C] Completed</button>
