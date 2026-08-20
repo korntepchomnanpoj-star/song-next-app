@@ -14,6 +14,9 @@ export default function ToDoList(){
     const [numOfTasks, setNoft] = useState(tasks.length);
     const [status, setStatus] = useState(null);
     const [openId, setOpenId] = useState(null);
+    const [editingTask, setEditingTask] = useState(null);
+
+    const resetEditingTask = () => setEditingTask(null);
 
     const filteredTasks = 
           status == null ? tasks 
@@ -41,11 +44,28 @@ export default function ToDoList(){
     }
 
     const onEdit = (t) => {
-      alert(`งานที่คุณต้องการแก้ไข ${t}`);
+      // alert(`งานที่คุณต้องการแก้ไข ${t}`);
+      setEditingTask(t);
+    }
+
+    const updateTask = (id, title, status) => {
+      setTasks(
+        tasks => tasks.map(
+          t => t.id === id ? 
+           {...t,
+           title: title,
+           status: status
+           } :t
+        ));
+        setEditingTask(null);
     }
 
     const onDelete = (id) => {
-      alert(`คุณต้องการลบข้อมูล รหัสงาน ${id}`);
+      // alert(`คุณต้องการลบข้อมูล รหัสงาน ${id}`);
+      const updateTasks = tasks.filter(
+        item => item.id !=id
+      );
+      setTasks(updateTasks);
     }
 
     const tmpTdl = filteredTasks.map((item,index) => { 
@@ -121,7 +141,14 @@ export default function ToDoList(){
         <div className="flex items-center gap-3"></div>
         <div>งานที่ต้องทำ {numOfTasks} รายการ</div>
         <div className="flex flex-wrap items-center justify-between gap-4 my-4">
-          <ToDoForm addTask={addTask} />
+          
+          <ToDoForm 
+          addTask={addTask}
+          editingTask={editingTask}
+          updateTask={updateTask}
+          resetEditingTask={resetEditingTask} 
+          />
+
           {/* <button className="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg transition font-medium" onClick={addTask}>เพิ่มงาน </button> */}
         <div className="flex items-center gap-2">
             <button className="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(null)}>[A] All</button>
