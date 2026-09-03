@@ -2,14 +2,14 @@
 
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { dataItem, appendItem } from "../data/dataitem";
+import { dataHerb } from "../data2/dataherb";
 import { Children, useState } from "react";
-import ToDoForm from "./components/ToDoForm";
+import HerbForm from "./components/HerbForm";
 import Modal from "./components/Modal";
 
 export default function ToDoList(){
     
-    const toDolist = [...dataItem, ...appendItem];
+    const toDolist = [...dataHerb];
     const [tasks, setTasks] = useState(toDolist);
     const [numOfTasks, setNoft] = useState(tasks.length);
     const [status, setStatus] = useState(null);
@@ -22,25 +22,12 @@ export default function ToDoList(){
           status == null ? tasks 
           :tasks.filter(
             (item) => item.status == status
-        ); 
- 
-    let name = "Korntep Chomnanpoj";
-    const major = "เทคโนโลยีสารสนเทศ (Information Technology)";
-    let classyear = 2;
-    let classSec = "ทส.ท.";
-    let active = true;
-
-    const isActive = (status: boolean) => {
-        if(status)
-       return <span style={{color: "green"}}>กำลังศึกษาอยู่</span>;
-       return <span style={{color: "red"}}>ไม่ไดเป็นนักศึกษาแล้วนะ</span>;
-    }
-
+        );
     
    const Status = (act: boolean) => {
         if(act)
-       return <span style={{color: "green"}}>Completed</span>;
-       return <span style={{color: "red"}}>ใช้ภายนอกและภายใน</span>;
+       return <span style={{color: "green"}}>ใช้ภายนอก</span>;
+       return <span style={{color: "red"}}>ใช้ภายในและภายนอก</span>;
     }
 
     const onEdit = (t) => {
@@ -69,30 +56,24 @@ export default function ToDoList(){
     }
 
     const tmpTdl = filteredTasks.map((item,index) => { 
-        const {id, title, desc, author, date_added, status } = item;
+        const {id, title, desc, suppiler, status } = item;
         return <ul key={id}>
         <div className="max w-86 mx-auto my-4 p-4 px-12 py-12 bg-white-600 text-black text-sm font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
       <h3 className="text-xl font-medium text-black">{title}</h3>
       <p className="text-slate-500 text-sm">{desc}</p>
-      <p className="text-slate-500 text-sm">{author}</p>
+      <p className="text-slate-500 text-sm">{suppiler}</p>
       <p className="text-slate-500 text-sm">{Status(status)}</p>
 
       <Modal open={openId === id} onClose={()=>setOpenId(null)}>
       <div className="p-4">
       <h2 className="text-2xl font-bold mb-2">{title}</h2>
       <p className="text-gray-700 mb-2">รายละเอียด: {desc}</p>
-      <p className="text-sm text-gray-500">ผู้เพิ่ม: {author}</p>
-      <p className="text-sm text-gray-500">วันที่: {date_added}</p>
+      <p className="text-sm text-gray-500">ผู้ผลิต: {suppiler}</p>
       <p className="text-sm text-gray-500">สถานะ: {Status(status)}</p>
       </div>
       </Modal>
 
       <div className="flex gap-2 mt-2">
-    {/* View */}
-    <button onClick={(e)=>setOpenId(id)} className="bg-green-500 text-white px-3 py-1 rounded">View</button>
-
-    {/* Edit */}
-    <button onClick={(e)=>onEdit(item)} className="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 
     {/* Delete */}
     <button onClick={(e)=>onDelete(id)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
@@ -101,48 +82,36 @@ export default function ToDoList(){
         </ul>;
 });
 
-    const addTask = (title, status) => {
+    const addTask = (title, status, desc, suppiler) => {
         const newTask = {
         id: tasks.length+1,
         title: title,
-        desc: "รายละเอียดของงานที่เพิ่ม",
-        date_added: "17/08/2569",
-        author: "Korntep C.",
+        desc: desc,
+        suppiler: suppiler,
         status: status
         };
 
         setTasks([...tasks, newTask]);
         setNoft(tasks.length+1);
     }
-    
-    console.log(`Name: ${name}`);
-    console.log(`Major: ${major}`);
 
     return(
         <>
         
         <Header/>
         <div className= "flex justify-center gap-3">
+
             
-    <a className="max w-md mx-auto my-12 p-12 px-4 py-3 bg-yellow-300 text-black text-sm font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
-      <p className="font-bold text-xl mb-2">To Do Lists:</p>
-      <p>
-        ชื่อ-สกุล: {name} <br></br> 
-        สาขาวิชา: {major} <br></br>
-        กลุ่มเรียน/ชั้นปี: {classSec} / {classyear} <br></br>
-        สถานะภาพนักศึกษา: {isActive(active)} <br></br>
-      </p>
-      </a>
+            
+   
       </div>
 
        
       <div className="bg-slate-200/60 p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 my-4">
 
-        <div className="flex items-center gap-3"></div>
-        <div>งานที่ต้องทำ {numOfTasks} รายการ</div>
         <div className="flex flex-wrap items-center justify-between gap-4 my-4">
           
-          <ToDoForm 
+          <HerbForm
           addTask={addTask}
           editingTask={editingTask}
           updateTask={updateTask}
@@ -151,9 +120,9 @@ export default function ToDoList(){
 
           {/* <button className="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg transition font-medium" onClick={addTask}>เพิ่มงาน </button> */}
         <div className="flex items-center gap-2">
-            <button className="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(null)}>[A] All</button>
-            <button className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(true)}>[C] Completed</button>
-            <button className="bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(false)}>[P] Pending</button>
+            <button className="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(null)}>All</button>
+            <button className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(true)}>ใช้ภายใน</button>
+            <button className="bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 rounded-lg transition font-medium"  onClick={() => setStatus(false)}>ใช้ภายนอกและภายใน</button>
             </div>
         </div>
       </div>
