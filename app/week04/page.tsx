@@ -18,10 +18,47 @@ export default function ToDoList() {
 
   const resetEditingTask = () => setEditingTask(null);
 
+<<<<<<< HEAD
   const filteredTasks =
     status == null ? tasks
       : tasks.filter(
         (item) => item.status == status
+=======
+    const isActive = (status: boolean) => {
+        if(status)
+       return <span style={{color: "green"}}>กำลังศึกษาอยู่</span>;
+       return <span style={{color: "red"}}>ไม่ไดเป็นนักศึกษาแล้วนะ</span>;
+    }
+
+    
+   const Status = (act: boolean) => {
+        if(act)
+       return <span style={{color: "green"}}>Completed</span>;
+       return <span style={{color: "red"}}>ใช้ภายนอกและภายใน</span>;
+    }
+
+    const onEdit = (t) => {
+      // alert(`งานที่คุณต้องการแก้ไข ${t}`);
+      setEditingTask(t);
+    }
+
+    const updateTask = (id, title, status) => {
+      setTasks(
+        tasks => tasks.map(
+          t => t.id === id ? 
+           {...t,
+           title: title,
+           status: status
+           } :t
+        ));
+        setEditingTask(null);
+    }
+
+    const onDelete = (id) => {
+      // alert(`คุณต้องการลบข้อมูล รหัสงาน ${id}`);
+      const updateTasks = tasks.filter(
+        item => item.id !=id
+>>>>>>> 0f596170d1870f3a1309399a3289fcea0882e3b5
       );
 
   let name = "Korntep Chomnanpoj";
