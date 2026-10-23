@@ -203,3 +203,6 @@
 
 //   );
 // }
+export default function Week04Page() {
+    return <div>Week 04</div>;
+}
