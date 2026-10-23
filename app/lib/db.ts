@@ -1,16 +1,12 @@
 import mysql from 'mysql2/promise';
 
+// ตั้งค่าเพื่อเชื่อมต่อกับฐานข้อมูล MySQL (XAMPP)
 export const pool = mysql.createPool({
-  host: 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com',
-  user: '279RAwtMQwyNT7C.root', // เอาค่า User จากหน้าเว็บ TiDB มาใส่
-  password: 'cni8kqIHa61PnCjC', // ใส่รหัสผ่าน TiDB ที่เซฟไว้
-  database: 'cozygames',
-  port: 4000,
-  ssl: {
-    minVersion: 'TLSv1.2',
-    rejectUnauthorized: false
-  },
+  host: 'localhost',
+  user: 'root',         // ค่าเริ่มต้นของ XAMPP คือ root
+  password: '',         // ค่าเริ่มต้นของ XAMPP รหัสผ่านจะว่างเปล่า
+  database: 'cozygames', // **เปลี่ยนเป็นชื่อฐานข้อมูลของคุณ**
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
 });

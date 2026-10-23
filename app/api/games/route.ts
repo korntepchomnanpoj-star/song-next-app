@@ -6,15 +6,10 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const db = await mysql.createConnection({
-      host: 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com',
-      user: '279RAWtMQwyNT7C.root',
-      password: 'cni8kqIHa61PnCJc',
-      database: 'cozygames',
-      port: 4000,
-      ssl: {
-        minVersion: 'TLSv1.2',
-        rejectUnauthorized: false
-      }
+      host: 'localhost',
+      user: 'root',
+      password: '',
+      database: 'cozygames'
     });
 
     // ดึงข้อมูลโดย JOIN ตาราง categories และ platforms ให้ตรงกับ E-R Diagram ปัจจุบัน
