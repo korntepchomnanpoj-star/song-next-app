@@ -1,15 +1,19 @@
 import express from 'express';
+import db from './config/firebase.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import db from './config/firebase.js';
+
+//login
+import bcrypt from 'bcryptjs'
+import jwt from  'jsonwebtoken'
 
 const app = express();
 const port = 8000;
 
-// Enable CORS for all routes
 app.use(cors());
 app.use(bodyParser.json());
 
+// Object array
 const myShops = [
     {
         shopId: 100,
@@ -34,30 +38,30 @@ const myShops = [
         shopStatus: true
     }];
 
-// GET: http://localhost:xxxx/api/shops
-app.get('/api/shops', async (req, res) => {
+// GET: http://localhost:8000/api/shops
+app.get('/api/shops', async(req, res) => { 
     try {
-        // คำสั่ง: สำหรับการอ่านหรือดึงข้อมูลจาก Documents ที่จัดเก็บภายใน Collection
-        const snapshot = await db
-            .collection("shops_it_70109")
-            .orderBy("shopName", "desc")
-            .get();
+// คำสั่ง: สำหรับการอ่านหรือดึงข้อมูลจาก Documents ที่จัดเก็บภายใน Collection
+    const snapshot = await db
+    .collection("shops_it_70109")
+    .orderBy("shopName", "desc")
+    .get();
 
-        const shops = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        }));
+    const shops =  snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+}));
 
-        res.json(shops);
+    res.json(shops);
     } catch (error) {
-        res.status(500).json(
-            {
-                message: "FAILED: การอ่านข้อมูล shops มีปัญหากรุณาตรวจสอบ",
-                error: error.message
-            }
-        );
-    }
-});
+    res.status(500).json(
+        {
+            message: "FAILED: การอ่านข้อมูล shops มีปัญหา กรุณาตรวจสอบ",
+            error: error.message
+        }
+    );
+}});
+
 
 // http://localhost:8000/
 app.get('/', (req, res) => {
@@ -66,56 +70,271 @@ app.get('/', (req, res) => {
 
 // Route สำหรับการ Read ข้อมูลจากฐานข้อมูลด้วย id
 // GET : http://localhos:xxxx/api/shops/1
-app.get('/api/shops/:id', async (req, res) => {
+app.get('/api/shops/:id', async (req, res) => { 
     try {
-        const doc = await db
-            .collection("shops_it_70109")
-            .doc(req.params.id)
-            .get();
+    // คำสั่ง: สำหรับการอ่านหรือดึงข้อมูลจาก Documents ที่จัดเก็บภายใน Collection ด้วย id
+    const doc = await db
+        .collection("shops_it_70109")
+    //    .where("shopId", "==", Number(req.params.id))
+        .doc(req.params.id)
+        .get();
 
-        res.json(
-            {
-                id: doc.id,
-                ...doc.data()
-            }
-        );
+    res.json(
+        {
+            id: doc.id,
+            ...doc.data()
+        }
+    );
     } catch (error) {
         res.status(500).json(
-            {
-                message: "FAILED: การอ่านข้อมูล shops ด้วยรหัสร้านค้า (shopId) มีปัญหา กรุณาตรวจสอบ",
-                error: error.message
-            }
-        );
-    }
-});
+        {
+            message: "FAILED: การอ่านข้อมูล shops ด้วยรหัสร้านค้า (shopId) มีปัญหา กรุณาตรวจสอบ",
+            error: error.message
+        }
+    );
+}});
 
 app.get('/shops{/:shopId}', (req, res) => {
+    res.set('Content-type', 'application/json');
     const { shopId } = req.params;
 
-    res.set('Content-type', 'application/json');
-
-    if (isNaN(shopId)) {
+    if(isNaN(shopId)){
         res.send(myShops);
-    } else {
+    }else{
         const shopItem = myShops.filter(
             shop => { return shop.shopId === Number(shopId) }
         );
         res.send(shopItem[0]);
     }
-
-    // let myText = '';
-    // myText += '<h1>Shop infromation:</h1><hr/>';
-    // myText += `<b>Shop ID:</b> ${myShops.shopId}<hr/>`;
-    // myText += `<b>Shop Name:</b> ${myShops.shopName}<hr/>`;
-    // myText += `<b>Shop Type:</b> ${myShops.shopType}<hr/>`;
-    // myText += `<b>Shop Location (Lat, Lon):</b>${myShops.shopLoc.lat}, ${myShops.shopLoc.lon}<hr/>`;
-    // myText += `<b>Shop Status:</b> ${myShops.shopStatus}<hr/>`;
+    
+    let myText = '';
+    myText+= '<h1>Shop information</h1><br/>';
+    myText+= `<br/><b>Shop ID:</b> ${myShops.shopId}`;
+    myText+= `<br/><b>Shop Name:</b> ${myShops.shopName}`;
+    myText+= `<br/><b>Shop Type:</b> ${myShops.shopType}`;
+    myText+= `<br/><b>Shop Location (Lat, Lon):</b>${myShops.shopLoc.lat}, ${myShops.shopLoc.lon}`;
+    myText+= `<br/><b>Shop Status:</b> ${myShops.shopStatus}`;
 
     res.set('Content-type', 'text/html');
     res.send(myText);
 });
 
-app.listen(port, () => {
+// การลบข้อมูลร้านค้าจากไฟร์เบสด้วย id (Method: DELETE)
+const deleteShop = async (req, res) => {
+    const ShopRef = db
+      .collection("shops_it_70109")
+      .doc(req.params.id);
+ 
+    await ShopRef.delete();
+ 
+    res.status(200).json({
+      message: "Shop deleted successfully",
+      id: req.params.id,
+    });
+}
+ 
+// App route: /api/shops/:id (Method: DELETE)
+// Endpoint: http://localhost:xxxx/api/shops/100
+app.delete('/api/shops/:id', (req, res) => {
+  try {
+    deleteShop(req, res);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to deleting shop.",
+      error: error.message,
+    });
+  }
+});
+
+// การสร้างข้อมูลร้านค้าในไฟร์เบส (Method: POST)
+const createShop = async (req, res) => {
+    const {
+      shopName,
+      shopType,
+      shopStatus,
+    } = req.body;
+ 
+    if (!shopName || !shopType || !shopStatus) {
+      return res.status(400).json({
+          message: "Xxx, xxx and xxx are required",
+      });
+    }
+ 
+    const shopRef = await db.collection("shops_it_70109").doc();
+    const newId = shopRef.id; // Access the generated ID
+ 
+    const newShop = {
+      shopId: newId,
+      shopName,
+      shopType,
+      shopStatus: shopStatus === 'true',
+    };
+ 
+    // Builder query: Add
+    const docRef = await db
+      .collection("shops_it_70109")
+      .add(newShop);
+ 
+    res.status(201).json({
+      id: docRef.id,
+      ...newShop,
+    });
+}
+ 
+// App route: /api/shops (Method: POST)
+// Endpoint: http://localhost:xxxx/api/shops
+app.post('/api/shops', (req, res) => {
+  try {
+    createShop(req, res);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to adding shop.",
+      error: error.message,
+    });
+  }
+});
+
+// การแก้ไขข้อมูลร้านค้าในไฟร์เบส (Method: PUT)
+const updateShop = async (req, res) => {
+
+  try {
+
+    const ShopRef = db
+      .collection("shops_it_70109")
+      .doc(req.params.id);
+
+    const doc = await ShopRef.get();
+
+    if (!doc.exists) {
+
+      return res.status(404).json({
+        message: "Shop not found",
+      });
+
+    }
+
+    const {
+      shopName,
+      shopType,
+      shopStatus,
+    } = req.body;
+
+    const updateData = {
+      shopName,
+      shopType,
+      shopStatus: shopStatus === 'true',
+    };
+
+    await ShopRef.update(updateData);
+
+    res.status(200).json({
+      id: req.params.id,
+      ...updateData,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Failed to update Shop",
+    });
+
+  }
+
+};
+
+// App route: /api/shops (Method: PUT)
+// Endpoint: http://localhost:xxxx/api/shops
+app.put('/api/shops/:id', (req, res) => {
+  try {
+    updateShop(req, res);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to updating shop.",
+      error: error.message,
+    });
+  }
+});
+
+
+app.listen(port, ()=> {
     console.log(`App listening on port ${port}...`);
 });
 
+// Login Route: http://localhost:8009/api/login
+app.post('/api/login', async (req, res) => {
+  const JWT_SECRET="REACT-NEXTJS-KHAEG"
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
+    }
+
+    // Query users collection by email
+    const snapshot = await db
+      .collection("[users]")
+      .where("email", "==", email.toLowerCase().trim())
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
+    }
+
+    const userDoc = snapshot.docs[0];
+
+    const user = {
+      id: userDoc.id,
+      ...userDoc.data(),
+    };
+
+    // Compare entered password with stored password hash
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.passwordHash
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
+    }
+
+    // Create JWT token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    // Do not return passwordHash to frontend
+    const safeUser = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: safeUser,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+});
