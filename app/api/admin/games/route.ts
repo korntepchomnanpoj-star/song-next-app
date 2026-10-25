@@ -104,7 +104,17 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     const db = await getDB();
+    
+    // 1. ทำการลบข้อมูลเกม
     await db.execute(`DELETE FROM games WHERE game_id=?`, [id]);
+
+    // 2. ค้นหา ID ที่สูงที่สุดในตารางตอนนี้
+    const [maxRows]: any = await db.execute(`SELECT MAX(game_id) as maxId FROM games`);
+    const nextId = (maxRows[0].maxId || 0) + 1;
+
+    // 3. สั่งรีเซ็ตตัวนับให้กลับมาเรียงต่อจาก ID ล่าสุดโดยอัตโนมัติ
+    await db.execute(`ALTER TABLE games AUTO_INCREMENT = ${nextId}`);
+    
     await db.end();
     return NextResponse.json({ success: true });
   } catch (error) {

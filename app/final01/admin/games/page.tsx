@@ -11,7 +11,7 @@ export default function AdminGamesPageReal() {
   const [category, setCategory] = useState('Simulation');
   const [platforms, setPlatforms] = useState('');
   const [developer, setDeveloper] = useState('');
-  const [downloadUrl, setDownloadUrl] = useState(''); // เพิ่ม State สำหรับลิงก์ดาวน์โหลด
+  const [downloadUrl, setDownloadUrl] = useState(''); 
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState('1'); 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -87,32 +87,32 @@ export default function AdminGamesPageReal() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert(`${type === 'INSERT' ? 'บันทึกข้อมูล' : 'อัปเดตข้อมูล'} ลงฐานข้อมูล XAMPP สำเร็จ!`);
+        alert(`${type === 'INSERT' ? 'บันทึกข้อมูล' : 'อัปเดตข้อมูล'} สำเร็จ!`);
         fetchGames();
         resetForm();
       } else {
-        alert('เกิดข้อผิดพลาดจากฐานข้อมูล (ลองเช็กชื่อ Database ใน phpMyAdmin)');
+        alert('เกิดข้อผิดพลาดจากฐานข้อมูล');
       }
     } catch (error) {
-      alert('เชื่อมต่อ XAMPP ไม่สำเร็จ');
+      alert('เชื่อมต่อระบบไม่สำเร็จ');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('ยืนยันการลบข้อมูลเกมนี้จากฐานข้อมูลจริง?')) return;
+    if (!confirm('ยืนยันการลบข้อมูลเกมนี้?')) return;
     try {
       const res = await fetch(`/api/admin/games?id=${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert('ลบข้อมูลออกจาก XAMPP สำเร็จ!');
+        alert('ลบข้อมูลสำเร็จ!');
         fetchGames();
       } else {
         alert('ลบข้อมูลไม่สำเร็จ');
       }
     } catch (error) {
-      alert('เชื่อมต่อ XAMPP ไม่สำเร็จ');
+      alert('เชื่อมต่อระบบไม่สำเร็จ');
     }
   };
 
@@ -172,9 +172,16 @@ export default function AdminGamesPageReal() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center border-b pb-3">
+      
+      {/* เมนูนำทางด้านบน */}
+      <div className="flex flex-col md:flex-row justify-between items-center border-b pb-4 gap-4">
         <h1 className="text-2xl font-bold text-green-700">จัดการข้อมูลเกม</h1>
-        <Link href="/final01" className="text-indigo-600 hover:underline text-sm font-semibold">&larr; กลับหน้าหลัก</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/final01/admin/games" className="bg-green-600 text-white px-4 py-2 rounded-md font-bold shadow-sm hover:bg-green-700">🎮 จัดการเกม</Link>
+          <Link href="/final01/admin/users" className="bg-indigo-600 text-white px-4 py-2 rounded-md font-bold shadow-sm hover:bg-indigo-700">👥 จัดการผู้ใช้</Link>
+          <Link href="/final01/admin/reviews" className="bg-red-600 text-white px-4 py-2 rounded-md font-bold shadow-sm hover:bg-red-700">💬 จัดการรีวิว</Link>
+          <Link href="/final01" className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-bold shadow-sm hover:bg-gray-300">🏠 หน้าหลัก</Link>
+        </div>
       </div>
       
       <div className="border-2 border-solid border-green-500 rounded-lg p-5 bg-white shadow-sm">
@@ -230,7 +237,7 @@ export default function AdminGamesPageReal() {
       </div>
 
       <div className="border-2 border-solid border-gray-400 rounded-lg p-5 bg-white shadow-sm">
-        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">6.3 ตารางแสดงผลจากฐานข้อมูลจริง</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">6.3 ตารางแสดงผลจากฐานข้อมูล</h2>
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="text-center py-10 font-bold text-gray-500">กำลังโหลด...</div>
@@ -249,7 +256,7 @@ export default function AdminGamesPageReal() {
               <tbody>
                 {(!games || games.length === 0) ? (
                   <tr>
-                    <td colSpan={6} className="p-6 text-center text-gray-400 font-semibold">ไม่มีข้อมูลเกมในระบบ (ตารางว่างเปล่า)</td>
+                    <td colSpan={6} className="p-6 text-center text-gray-400 font-semibold">ไม่มีข้อมูลเกมในระบบ</td>
                   </tr>
                 ) : (
                   games.map((g) => (

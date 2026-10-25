@@ -6,19 +6,34 @@ export async function POST(request: Request) {
     const { email, password } = await request.json();
     
     const db = await mysql.createConnection({ 
-      host: 'localhost', user: 'root', password: '', database: 'cozygames' 
+      host: 'localhost', user: 'root', password: '', database: 'cozygames', port: 3306
     });
     
+    // ดึง status มาตรวจสอบด้วย
     const [users]: any = await db.execute(
-      'SELECT user_id, username, email FROM users WHERE email = ? AND password_hash = ? AND status = "active"',
+      'SELECT user_id, username, email, status FROM users WHERE email = ? AND password_hash = ?',
       [email, password]
     );
     
     await db.end();
 
     if (users.length > 0) {
-      // คืนค่าข้อมูล User กลับไปให้หน้าเว็บใช้งาน
-      return NextResponse.json({ success: true, user: users[0] });
+      const user = users[0];
+      
+      // 1. เช็กว่าโดนแบน (ระงับบัญชี) หรือไม่
+      if (user.status === 'suspended') {
+        return NextResponse.json({ error: 'บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อแอดมิน' }, { status: 403 });
+      }
+
+      // 2. ถ้าสถานะปกติ (active) ให้เข้าสู่ระบบได้
+      return NextResponse.json({ 
+        success: true, 
+        user: { 
+          user_id: user.user_id, 
+          username: user.username, 
+          email: user.email 
+        } 
+      });
     } else {
       return NextResponse.json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' }, { status: 401 });
     }
