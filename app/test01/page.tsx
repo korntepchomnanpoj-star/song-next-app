@@ -11,9 +11,7 @@ type Music = {
 
 export default function Test01Page() {
     const [musics, setMusics] = useState<Music[]>([
-        { id: 1, title: 'Idol - YOASOBI', genre: 'J-Pop' },
-        { id: 2, title: 'Connect - ClariS', genre: 'Anime OST' },
-        { id: 3, title: 'NO SCARED - ONE OK ROCK', genre: 'J-Rock' }
+
     ]);
 
     const [newTitle, setNewTitle] = useState('');
