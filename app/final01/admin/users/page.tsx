@@ -1,10 +1,21 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AdminUsersPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // ระบบล็อกสิทธิ์: เช็กว่าใช่แอดมินจริงไหม
+  useEffect(() => {
+    const adminData = localStorage.getItem('admin');
+    if (!adminData) {
+      alert('เฉพาะผู้ดูแลระบบเท่านั้น! กำลังพากลับหน้าหลัก');
+      router.push('/final01');
+    }
+  }, [router]);
 
   const [editId, setEditId] = useState<number | null>(null);
   const [username, setUsername] = useState('');
@@ -60,8 +71,6 @@ export default function AdminUsersPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
-      
-      {/* เมนูนำทางด้านบน */}
       <div className="flex flex-col md:flex-row justify-between items-center border-b pb-4 gap-4">
         <h1 className="text-2xl font-bold text-indigo-700">จัดการบัญชีผู้ใช้งาน</h1>
         <div className="flex flex-wrap gap-2">
